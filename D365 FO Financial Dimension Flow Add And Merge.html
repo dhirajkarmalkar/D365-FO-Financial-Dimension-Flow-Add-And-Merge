@@ -37,6 +37,8 @@
 .mtx tr.grp td{background:var(--accent2);color:var(--accent);font-weight:700;font-size:.68rem;text-transform:uppercase;letter-spacing:.5px;padding:5px 8px}
 .expl{font-size:.82rem;color:var(--text2);background:var(--accent2);border-left:4px solid var(--accent);border-radius:var(--r);padding:.8rem 1rem;margin-bottom:1rem;line-height:1.65}
 .expl strong{color:var(--accent)}
+.disclaimer{background:var(--ov2);border:.5px solid var(--ov);border-left:4px solid var(--ov);border-radius:var(--r);padding:.85rem 1.1rem;margin-bottom:1.4rem;font-size:.82rem;color:var(--ov);line-height:1.6}
+.disclaimer strong{font-weight:700}
 .drm{margin-left:auto;height:34px;width:34px;border:1px solid var(--border);background:var(--card);border-radius:8px;color:var(--text3);cursor:pointer;font-size:1.15rem;line-height:1}.drm:hover{color:#A32D2D;border-color:#A32D2D}
 .mtx{width:100%;border-collapse:collapse;font-size:.8rem;margin-top:.3rem}
 .mtx th,.mtx td{border:.5px solid var(--border);padding:5px 8px;text-align:left}
@@ -86,6 +88,8 @@ footer{text-align:center;padding:1.7rem;color:var(--text3);font-size:.74rem;bord
 <body>
 <div class="hdr"><h1>D365 F&O — Financial Dimension Flow · All Processes</h1><p>Set each master's default financial dimensions once, then trace how every dimension defaults, merges, and posts — with the ledger entries each posting hits — across the finance processes of every module.</p><div class="b">Default-dimension matrix &bull; 9 process areas &bull; 50+ flows &bull; ledger postings</div></div>
 <div class="wrap">
+
+<div class="disclaimer"><strong>For demonstration and learning purposes only.</strong> This tool is an unofficial, simplified illustration of standard / typical D365 Finance &amp; Operations financial dimension defaulting and posting behavior. It is not Microsoft documentation or guidance, is not affiliated with or endorsed by Microsoft, and may not reflect your configuration, version, or the results of actual posting. Customers and partners should independently verify all behavior against Microsoft Learn documentation and their own tested environment before relying on it. Use at your own discretion for learning only.</div>
 
 <div class="box">
 <div class="sl"><span>1 · Dimensions</span><span class="acts"><button class="btn2" id="addBtn">+ Add dimension</button><button class="btn2" id="clearBtn">Clear all</button><button class="btn" id="resetBtn">Reset to example</button></span></div>
