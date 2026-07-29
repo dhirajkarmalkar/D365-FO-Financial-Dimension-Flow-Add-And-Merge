@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D365 F&O — Financial Dimension Flow · All Processes</title>
+<style>
+:root{--bg:#F8F7F4;--card:#fff;--surface:#F0EFEB;--border:#DDD9D0;--text:#1A1918;--text2:#5C5A54;--text3:#918F88;--accent:#1B5E8A;--accent2:#E6F0F8;--dr:#0B6B50;--dr2:#E1F5ED;--cr:#9A3A1B;--cr2:#FBF0EB;--ov:#8A5A0B;--ov2:#F7EFD9;--font:'Segoe UI',system-ui,-apple-system,sans-serif;--mono:'SF Mono',ui-monospace,'Cascadia Code','Consolas',monospace;--r:10px;--rl:14px;--sh:0 1px 3px rgba(0,0,0,.04),0 0 0 .5px rgba(0,0,0,.06)}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6}
+.hdr{background:linear-gradient(135deg,#0F3557,#1B5E8A 50%,#2A7AB0);color:#fff;padding:2.2rem 2rem 1.7rem;text-align:center}
+.hdr h1{font-size:1.65rem;font-weight:700;letter-spacing:-.5px}.hdr p{font-size:.9rem;opacity:.85;max-width:660px;margin:.3rem auto 0}
+.hdr .b{display:inline-block;background:rgba(255,255,255,.18);padding:3px 14px;border-radius:20px;font-size:.76rem;margin-top:.7rem}
+.wrap{max-width:1120px;margin:0 auto;padding:1.5rem}
+.box{background:var(--card);border:.5px solid var(--border);border-radius:var(--rl);padding:1.4rem;box-shadow:var(--sh);margin-bottom:1.4rem}
+.sl{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:.85rem;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.sl .acts{display:flex;gap:8px}
+.btn{height:34px;padding:0 15px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:.8rem;font-weight:600;cursor:pointer;font-family:var(--font)}.btn:hover{background:#14496B}
+.btn2{height:34px;padding:0 13px;background:0 0;color:var(--text2);border:1px solid var(--border);border-radius:8px;font-size:.78rem;cursor:pointer;font-family:var(--font)}.btn2:hover{background:var(--surface)}
+.fd-lab{font-size:.7rem;color:var(--text2);font-weight:600;display:block}
+.fd-in,.fd-sel{height:36px;padding:0 9px;font-size:.83rem;font-family:var(--font);border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text)}
+.fd-in:focus,.fd-sel:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px rgba(27,94,138,.1)}
+.fd-sel{cursor:pointer}
+.drow{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;padding:10px 12px;border:.5px solid var(--border);border-radius:var(--r);margin-bottom:8px;background:var(--surface)}
+.dcol{display:flex;flex-direction:column;gap:4px}
+.dcol .fd-in[data-f=name]{width:140px}.dcol .fd-sel[data-f=backing]{width:170px}
+.ent-note{font-size:.77rem;color:var(--accent);background:var(--accent2);padding:7px 11px;border-radius:6px;border:.5px solid var(--accent);font-weight:600}
+.ou-tag{font-size:.72rem;color:var(--ov);background:var(--ov2);padding:6px 10px;border-radius:6px;align-self:center}
+.dcard{border:.5px solid var(--border);border-radius:var(--r);padding:10px 12px;margin-bottom:8px;background:var(--surface)}
+.dcard .drow{border:none;background:none;padding:0;margin:0}
+.vals{margin-top:10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.vchip{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:.5px solid var(--border);border-radius:6px;padding:4px 9px;font-size:.82rem;font-weight:600}
+.vchip button{border:none;background:none;color:var(--text3);cursor:pointer;font-size:1rem;line-height:1;padding:0}.vchip button:hover{color:#A32D2D}
+.vadd{height:32px;width:130px;padding:0 9px;border:1px dashed var(--border);border-radius:6px;font-size:.82rem;font-family:var(--font);background:var(--card);color:var(--text)}
+.vadd:focus{outline:0;border-color:var(--accent);border-style:solid}
+.vaddbtn{height:32px;min-width:32px;border:1px solid var(--border);background:var(--card);border-radius:6px;cursor:pointer;color:var(--accent);font-size:1.1rem;line-height:1}.vaddbtn:hover{background:var(--accent2)}
+.mtx tr.grp td{background:var(--accent2);color:var(--accent);font-weight:700;font-size:.68rem;text-transform:uppercase;letter-spacing:.5px;padding:5px 8px}
+.expl{font-size:.82rem;color:var(--text2);background:var(--accent2);border-left:4px solid var(--accent);border-radius:var(--r);padding:.8rem 1rem;margin-bottom:1rem;line-height:1.65}
+.expl strong{color:var(--accent)}
+.drm{margin-left:auto;height:34px;width:34px;border:1px solid var(--border);background:var(--card);border-radius:8px;color:var(--text3);cursor:pointer;font-size:1.15rem;line-height:1}.drm:hover{color:#A32D2D;border-color:#A32D2D}
+.mtx{width:100%;border-collapse:collapse;font-size:.8rem;margin-top:.3rem}
+.mtx th,.mtx td{border:.5px solid var(--border);padding:5px 8px;text-align:left}
+.mtx th{background:var(--surface);color:var(--text2);font-weight:600;font-size:.74rem}
+.mtx td:first-child,.mtx th:first-child{background:var(--surface);font-weight:600;color:var(--text2)}
+.mtx select{height:30px;width:100%;min-width:90px;border:1px solid var(--border);border-radius:6px;background:var(--card);font-size:.8rem;font-family:var(--font);color:var(--text);cursor:pointer}
+.subnote{font-size:.77rem;color:var(--text3);margin-top:.7rem;line-height:1.6}
+.subnote strong{color:var(--text2)}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:.9rem}
+.tab{padding:8px 14px;font-size:.82rem;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--text2);border-radius:8px;transition:.15s}
+.tab:hover{background:var(--surface)}.tab.on{color:#fff;background:var(--accent);border-color:var(--accent)}
+.procsel{margin-bottom:1.1rem}
+.hint{font-size:.81rem;color:var(--text2);background:var(--accent2);border-left:4px solid var(--accent);border-radius:var(--r);padding:.7rem 1rem;margin-bottom:1.1rem;line-height:1.6}
+.hint strong{color:var(--accent)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.77rem;color:var(--text2);margin-bottom:1rem}
+.legend .r{display:flex;align-items:center;gap:6px}
+.pill{display:inline-block;min-width:62px;text-align:center;padding:4px 9px;border-radius:7px;font-size:.83rem;font-weight:700}
+.stage{background:var(--card);border:.5px solid var(--border);border-radius:var(--r);padding:.6rem 1rem;box-shadow:var(--sh)}
+.stage-row{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.stage-nm{font-size:.88rem;font-weight:600;flex:1;min-width:150px}
+.stage-cap{font-size:.72rem;color:var(--text3);margin-top:3px}
+.post-block{margin-top:8px;padding-top:8px;border-top:.5px dashed var(--border)}
+.post-block .lbl{font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text3);margin-bottom:6px}
+.pline{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:3px 0}
+.pdims{display:flex;flex-wrap:wrap;gap:5px}
+.pdim{font-size:.7rem;padding:2px 7px;border-radius:5px;background:var(--surface);border:.5px solid var(--border);color:var(--text2);font-weight:600}
+.pnone{font-size:.7rem;color:var(--text3);font-style:italic}
+.pdim.preq{background:var(--cr2);color:var(--cr);border-color:var(--cr)}
+.acc{font-size:.73rem;padding:3px 8px;border-radius:5px;font-weight:600}
+.acc-d{background:var(--dr2);color:var(--dr)}
+.acc-c{background:var(--cr2);color:var(--cr)}
+.struct{margin-top:9px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;font-size:.75rem;color:var(--text2)}
+.struct .slbl{font-weight:700;color:var(--text3);font-size:.68rem;text-transform:uppercase;letter-spacing:.4px}
+.struct label{display:flex;gap:5px;align-items:center;cursor:pointer}
+.struct input{width:auto;cursor:pointer}
+.cells{display:flex;gap:12px;flex-wrap:wrap}
+.cell{text-align:center}
+.cell .cap{font-size:.59rem;color:var(--text3);margin-bottom:3px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;max-width:82px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.arrow{text-align:center;color:var(--text3);font-size:1.1rem;line-height:1;margin:2px 0}
+.divr{font-size:.65rem;color:var(--text3);margin:12px 0 9px;display:flex;align-items:center;gap:10px;text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+.divr .ln{flex:1;height:1px;background:var(--border)}
+.empty{text-align:center;padding:2rem 1rem;color:var(--text3);font-size:.85rem}
+footer{text-align:center;padding:1.7rem;color:var(--text3);font-size:.74rem;border-top:1px solid var(--border);margin-top:1.5rem}
+@media(max-width:640px){.hdr h1{font-size:1.2rem}.pill{min-width:50px}.mtx{font-size:.72rem}}
+</style>
+</head>
+<body>
+<div class="hdr"><h1>D365 F&O — Financial Dimension Flow · All Processes</h1><p>Set each master's default financial dimensions once, then trace how every dimension defaults, merges, and posts — with the ledger entries each posting hits — across the finance processes of every module.</p><div class="b">Default-dimension matrix &bull; 9 process areas &bull; 50+ flows &bull; ledger postings</div></div>
+<div class="wrap">
+
+<div class="box">
+<div class="sl"><span>1 · Dimensions</span><span class="acts"><button class="btn2" id="addBtn">+ Add dimension</button><button class="btn2" id="clearBtn">Clear all</button><button class="btn" id="resetBtn">Reset to example</button></span></div>
+<div id="dimList"></div>
+<div class="subnote">Three backing categories. The backing type sets where a dimension's <strong>values</strong> come from — a custom list you type, operating units (business unit, cost center, department, value stream) from Org admin, or an entity table (customers, vendors, workers, items, projects, fixed assets, banks, sites). <strong>Every</strong> dimension defaults onto transactions through the default financial dimensions on masters (set below), copies header&rarr;line, and fills blanks from the line source. Entity-backed dimensions <em>additionally</em> auto-populate as their own party account where that party is on the document — but, being ordinary dimensions, they can also be defaulted from any other master (a customer dimension carried on a vendor, item, project, and so on).</div>
+</div>
+
+<div class="box">
+<div class="sl"><span>2 · Master-level vs line-level defaults</span></div>
+<div class="expl"><strong>Master level</strong> = the default financial dimensions carried by the document's primary / header master — the customer, vendor, worker, project, fixed asset, bank, or journal name. They apply first, at the header, then copy to the line. <strong>Line level</strong> = defaults applied at the transaction line: the released product (item) and the site-linked dimension. They fill only the segments the master left blank — they never overwrite a value the master already set. Every dimension is a column here (entity-backed ones included), so you can, for example, set a customer dimension to default from a vendor or an item. Set a value once and every process reuses it wherever that source appears.</div>
+<div id="matrixWrap"></div>
+<div class="subnote">The <strong>Item</strong> row is the released product's default financial dimensions — the single value reused on every sales line, purchase line, inventory, production, and project-item transaction where the item is present. (In inventory and production the item is the primary master, so its value shows there as a header source.)</div>
+</div>
+
+<div class="box">
+<div class="sl"><span>3 · Account structure</span></div>
+<div class="expl">In D365 there's no "balance sheet vs P&amp;L" switch on a dimension — the <strong>account structure</strong> decides it. For each main-account range, mark each dimension <strong>Required</strong>, <strong>Optional</strong> (allowed, blanks OK), or <strong>Not allowed</strong> (must be blank). At posting, the account's main-account range selects the row and any dimension not allowed there is stripped from that line — this is how, e.g., cost center posts on revenue but is blocked on receivables.</div>
+<div id="structWrap"></div>
+</div>
+
+<div class="sl" style="margin:0 0 .5rem"><span>4 · Choose a process and trace</span></div>
+
+<div class="tabs" id="areaTabs"></div>
+<div class="procsel"><label class="fd-lab">Process</label><select class="fd-sel" id="procSel" style="width:100%;max-width:520px"></select></div>
+<div class="hint" id="hint"></div>
+<div class="legend">
+<span class="r"><span class="pill" style="min-width:0;padding:2px 8px;background:var(--accent2);color:var(--accent)">C-1010</span>Entity-backed (= the account)</span>
+<span class="r"><span class="pill" style="min-width:0;padding:2px 8px;background:var(--dr2);color:var(--dr)">010</span>From a header / primary master</span>
+<span class="r"><span class="pill" style="min-width:0;padding:2px 8px;background:var(--ov2);color:var(--ov)">500</span>Filled from a line source</span>
+<span class="r"><span class="pill" style="min-width:0;padding:2px 8px;background:transparent;color:var(--text3);border:.5px solid var(--border)">&mdash;</span>Not populated</span>
+</div>
+
+<div class="box"><div class="sl" id="flowTitle">Dimension flow</div><div id="flow"></div></div>
+
+</div>
+<footer>D365 F&O Financial Dimension Flow &bull; Default-dimension matrix across all modules &bull; Standard/typical posting flows per Microsoft Learn</footer>
+
+<script>
+/* ================= reference ================= */
+const BACKGROUPS=[
+ {g:'Custom',items:['Custom list']},
+ {g:'Operating units',items:['Business unit','Cost center','Department','Value stream']},
+ {g:'Entity-backed',items:['Customer','Vendor','Worker','Item','Project','Fixed asset','Bank account','Legal entity / Site']}
+];
+const OU=['Business unit','Cost center','Department','Value stream'];
+const EK={'Customer':'customer','Vendor':'vendor','Worker':'worker','Item':'item','Project':'project','Fixed asset':'asset','Bank account':'bank','Legal entity / Site':'site',
+ 'Custom list':null,'Business unit':null,'Cost center':null,'Department':null,'Value stream':null};
+const ENT={customer:'C-1010',vendor:'V-2200',worker:'W-330',item:'ITM-100',project:'PRJ-77',asset:'FA-014',bank:'BANK-01',site:'SITE-1'};
+const ELAB={customer:'customer',vendor:'vendor',worker:'worker',item:'item',project:'project',asset:'fixed asset',bank:'bank account',site:'site'};
+const SRC_MASTER=[['customer','Customer'],['vendor','Vendor'],['worker','Worker'],['project','Project'],['asset','Fixed asset'],['bank','Bank account'],['ledger','Journal name / ledger']];
+const SRC_LINE=[['item','Item (released product)'],['site','Site']];
+/* account structure: main-account ranges (rows) × dimensions (cols); each cell req/opt/no */
+const CATS=[['asset','Assets — 1xxxxx'],['liability','Liabilities — 2xxxxx'],['revenue','Revenue — 4xxxxx'],['expense','Expenses / COGS — 5xxxxx–6xxxxx']];
+const RULES=[['req','Required'],['opt','Optional'],['no','Not allowed']];
+/* map a ledger account to its main-account category */
+function acctCategory(acc){
+ const a=acc.toLowerCase();
+ const pnl=/(revenue|cost of goods|\bcogs\b|expense|\bprofit\b|\bloss\b|\bgain\b|absorbed|variance|charges|interest income|bad debt|allocated (in|out)|recognized|elimination|unrealized fx|production offset|payroll allocation|wip \/ cost|offset — ledger|ledger offset|fee revenue|ledger account —|income)/.test(a);
+ if(pnl){
+  if(/revenue|income|\bgain\b|\bprofit\b|elimination — intercompany revenue|allocated in|revaluation reserve/.test(a)) return 'revenue';
+  return 'expense';
+ }
+ if(/payable|accrual|customer prepayment|due to|deferred|acquisition offset|tax payable|worker payable|ap offset/.test(a)) return 'liability';
+ return 'asset';
+}
+const SRCSHORT={customer:'customer master',vendor:'vendor master',item:'item default',project:'project default',worker:'worker default',bank:'bank default',asset:'asset default',ledger:'journal / ledger default',site:'site-linked dimension'};
+
+/* ================= process catalog ================= */
+/* stage: {n:name, e:[entities present], f:[[source,role]]}  role 'p'=header/primary (green) 'l'=line source (amber) */
+const PROCS={
+/* ---- Order to cash ---- */
+ so_stock:{n:'Sales order — stocked item',lf:3,s:[
+   {n:'Customer master',e:['customer'],f:[['customer','p']]},
+   {n:'Sales order header',e:['customer'],f:[]},
+   {n:'Sales order line (item)',e:['customer','item'],f:[['item','l']]},
+   {n:'Picking list',e:['customer','item'],f:[]},
+   {n:'Packing slip',e:['customer','item'],f:[]},
+   {n:'Sales invoice',e:['customer','item'],f:[]},
+   {n:'Customer payment',e:['customer','bank'],f:[['customer','p']],nd:1}]},
+ so_direct:{n:'Sales order — direct delivery',lf:3,s:[
+   {n:'Customer master',e:['customer'],f:[['customer','p']]},
+   {n:'Sales order header',e:['customer'],f:[]},
+   {n:'Sales order line (item)',e:['customer','item'],f:[['item','l']]},
+   {n:'Packing slip',e:['customer','item'],f:[]},
+   {n:'Sales invoice',e:['customer','item'],f:[]},
+   {n:'Customer payment',e:['customer','bank'],f:[['customer','p']],nd:1}]},
+ fti:{n:'Free text invoice (non-item)',lf:3,s:[
+   {n:'Customer master',e:['customer'],f:[['customer','p']]},
+   {n:'FTI header',e:['customer'],f:[]},
+   {n:'FTI line (ledger account)',e:['customer','ledger'],f:[['ledger','l']]},
+   {n:'Invoice posting',e:['customer','ledger'],f:[]},
+   {n:'Customer payment',e:['customer','bank'],f:[['customer','p']],nd:1}]},
+ sales_agr:{n:'Sales agreement — release order',lf:3,s:[
+   {n:'Customer master',e:['customer'],f:[['customer','p']]},
+   {n:'Sales agreement',e:['customer'],f:[]},
+   {n:'Release order line (item)',e:['customer','item'],f:[['item','l']]},
+   {n:'Packing slip',e:['customer','item'],f:[]},
+   {n:'Sales invoice',e:['customer','item'],f:[]}]},
+ so_return:{n:'Sales return order (RMA)',lf:3,s:[
+   {n:'Customer master',e:['customer'],f:[['customer','p']]},
+   {n:'Return order header',e:['customer'],f:[]},
+   {n:'Return line (item)',e:['customer','item'],f:[['item','l']]},
+   {n:'Return receipt',e:['customer','item'],f:[]},
+   {n:'Credit note invoice',e:['customer','item'],f:[]}]},
+ cust_pay:{n:'Customer payment journal',lf:1,s:[
+   {n:'Payment journal name',e:['ledger'],f:[['ledger','p']]},
+   {n:'Journal line (customer)',e:['customer','bank'],f:[['customer','l']]},
+   {n:'Settlement to invoice',e:['customer','bank'],f:[]},
+   {n:'Posted voucher',e:['customer','bank'],f:[]}]},
+ cust_prepay:{n:'Customer prepayment + application',lf:1,s:[
+   {n:'Payment journal name',e:['ledger'],f:[['ledger','p']]},
+   {n:'Prepayment line (customer)',e:['customer','bank'],f:[['customer','l']]},
+   {n:'Prepayment posting',e:['customer','bank'],f:[]},
+   {n:'Application to invoice',e:['customer'],f:[]}]},
+ bad_debt:{n:'Bad debt write-off',lf:1,s:[
+   {n:'Customer balance',e:['customer'],f:[['customer','p']]},
+   {n:'Write-off journal',e:['customer','ledger'],f:[['ledger','l']]},
+   {n:'Posted voucher',e:['customer','ledger'],f:[]}]},
+ interest:{n:'Interest note / collection fee',lf:2,s:[
+   {n:'Customer master',e:['customer'],f:[['customer','p']]},
+   {n:'Interest note',e:['customer'],f:[]},
+   {n:'Interest posting',e:['customer','ledger'],f:[['ledger','l']]},
+   {n:'Posted voucher',e:['customer','ledger'],f:[]}]},
+/* ---- Procure to pay ---- */
+ po_stock:{n:'Purchase order — stocked item',lf:4,s:[
+   {n:'Vendor master',e:['vendor'],f:[['vendor','p']]},
+   {n:'Purchase order header',e:['vendor'],f:[]},
+   {n:'Purchase order line (item)',e:['vendor','item'],f:[['item','l']]},
+   {n:'PO confirmation',e:['vendor','item'],f:[]},
+   {n:'Product receipt',e:['vendor','item'],f:[]},
+   {n:'Vendor invoice',e:['vendor','item'],f:[]},
+   {n:'Vendor payment',e:['vendor','bank'],f:[['vendor','p']],nd:1}]},
+ po_service:{n:'Purchase order — category / service',lf:3,s:[
+   {n:'Vendor master',e:['vendor'],f:[['vendor','p']]},
+   {n:'Purchase order header',e:['vendor'],f:[]},
+   {n:'PO line (category / ledger)',e:['vendor','ledger'],f:[['ledger','l']]},
+   {n:'Product receipt (service)',e:['vendor','ledger'],f:[]},
+   {n:'Vendor invoice',e:['vendor','ledger'],f:[]},
+   {n:'Vendor payment',e:['vendor','bank'],f:[['vendor','p']],nd:1}]},
+ po_return:{n:'Purchase return order',lf:3,s:[
+   {n:'Vendor master',e:['vendor'],f:[['vendor','p']]},
+   {n:'Return PO header',e:['vendor'],f:[]},
+   {n:'Return line (item)',e:['vendor','item'],f:[['item','l']]},
+   {n:'Return shipment',e:['vendor','item'],f:[]},
+   {n:'Credit note',e:['vendor','item'],f:[]}]},
+ vend_inv_po:{n:'Vendor invoice — PO 3-way match',lf:2,s:[
+   {n:'Vendor master',e:['vendor'],f:[['vendor','p']]},
+   {n:'PO line (matched)',e:['vendor','item'],f:[['item','l']]},
+   {n:'Accounting distribution',e:['vendor','item'],f:[]},
+   {n:'Vendor invoice line',e:['vendor','item'],f:[]},
+   {n:'Invoice posting',e:['vendor','item'],f:[]},
+   {n:'Vendor payment',e:['vendor','bank'],f:[['vendor','p']],nd:1}]},
+ vend_inv_nonpo:{n:'Vendor invoice — non-PO (journal)',lf:3,s:[
+   {n:'Vendor master',e:['vendor'],f:[['vendor','p']]},
+   {n:'Invoice header',e:['vendor'],f:[]},
+   {n:'Invoice line (ledger account)',e:['vendor','ledger'],f:[['ledger','l']]},
+   {n:'Invoice posting',e:['vendor','ledger'],f:[]},
+   {n:'Vendor payment',e:['vendor','bank'],f:[['vendor','p']],nd:1}]},
+ purch_agr:{n:'Purchase agreement — release order',lf:3,s:[
+   {n:'Vendor master',e:['vendor'],f:[['vendor','p']]},
+   {n:'Purchase agreement',e:['vendor'],f:[]},
+   {n:'Release order line (item)',e:['vendor','item'],f:[['item','l']]},
+   {n:'Product receipt',e:['vendor','item'],f:[]},
+   {n:'Vendor invoice',e:['vendor','item'],f:[]}]},
+ vend_pay:{n:'Vendor payment journal',lf:1,s:[
+   {n:'Payment journal name',e:['ledger'],f:[['ledger','p']]},
+   {n:'Journal line (vendor)',e:['vendor','bank'],f:[['vendor','l']]},
+   {n:'Settlement to invoice',e:['vendor','bank'],f:[]},
+   {n:'Posted voucher',e:['vendor','bank'],f:[]}]},
+ vend_prepay:{n:'Vendor prepayment + application',lf:1,s:[
+   {n:'Payment journal name',e:['ledger'],f:[['ledger','p']]},
+   {n:'Prepayment line (vendor)',e:['vendor','bank'],f:[['vendor','l']]},
+   {n:'Prepayment posting',e:['vendor','bank'],f:[]},
+   {n:'Application to invoice',e:['vendor'],f:[]}]},
+/* ---- Record to report ---- */
+ gl_journal:{n:'General journal (GL-to-GL)',lf:3,s:[
+   {n:'Journal name default',e:['ledger'],f:[['ledger','p']]},
+   {n:'Journal header',e:['ledger'],f:[]},
+   {n:'Journal line (main account)',e:['ledger'],f:[]},
+   {n:'Offset account line',e:['ledger'],f:[]},
+   {n:'Posted voucher',e:['ledger'],f:[]}]},
+ allocation:{n:'Allocation journal',lf:2,s:[
+   {n:'Allocation rule / journal name',e:['ledger'],f:[['ledger','p']]},
+   {n:'Source (distribute-from) line',e:['ledger'],f:[]},
+   {n:'Destination (allocate-to) lines',e:['ledger'],f:[]},
+   {n:'Posted voucher',e:['ledger'],f:[]}]},
+ accrual:{n:'Accrual scheme / deferral',lf:2,s:[
+   {n:'Accrual scheme / journal name',e:['ledger'],f:[['ledger','p']]},
+   {n:'Deferral voucher line',e:['ledger'],f:[]},
+   {n:'Recognition schedule postings',e:['ledger'],f:[]},
+   {n:'Posted vouchers',e:['ledger'],f:[]}]},
+ fx_reval:{n:'Foreign currency revaluation',lf:1,s:[
+   {n:'Balance (AR / AP / GL / Bank)',e:['ledger'],f:[['ledger','p']]},
+   {n:'Revaluation run',e:['ledger'],f:[]},
+   {n:'Unrealized gain / loss posting',e:['ledger'],f:[]},
+   {n:'Posted voucher',e:['ledger'],f:[]}]},
+ ledger_settle:{n:'Ledger settlement',lf:2,s:[
+   {n:'Ledger account transactions',e:['ledger'],f:[['ledger','p']]},
+   {n:'Ledger settlement (match)',e:['ledger'],f:[]},
+   {n:'Settled — no new ledger impact',e:['ledger'],f:[]}]},
+ intercompany:{n:'Intercompany journal',lf:2,s:[
+   {n:'Originating journal name',e:['ledger'],f:[['ledger','p']]},
+   {n:'Journal line (due to / from)',e:['ledger'],f:[]},
+   {n:'Intercompany posting (both LEs)',e:['ledger'],f:[]},
+   {n:'Posted vouchers',e:['ledger'],f:[]}]},
+ consolidation:{n:'Consolidation / elimination',lf:2,s:[
+   {n:'Subsidiary balances',e:['ledger'],f:[['ledger','p']]},
+   {n:'Consolidation import',e:['ledger'],f:[]},
+   {n:'Elimination journal',e:['ledger'],f:[]},
+   {n:'Consolidated voucher',e:['ledger'],f:[]}]},
+/* ---- Project to profit ---- */
+ pj_hour:{n:'Project — hour (timesheet)',lf:3,s:[
+   {n:'Worker / resource',e:['worker'],f:[['worker','p']]},
+   {n:'Project / funding source',e:['worker','project'],f:[['project','l']]},
+   {n:'Timesheet (hour) line',e:['worker','project'],f:[]},
+   {n:'Project posting',e:['worker','project'],f:[]},
+   {n:'Posted voucher',e:['worker','project'],f:[]}]},
+ pj_expense:{n:'Project — expense',lf:3,s:[
+   {n:'Project',e:['project'],f:[['project','p']]},
+   {n:'Worker / expense category',e:['worker','project'],f:[['worker','l']]},
+   {n:'Expense journal line',e:['worker','project'],f:[]},
+   {n:'Project posting',e:['worker','project'],f:[]},
+   {n:'Posted voucher',e:['worker','project'],f:[]}]},
+ pj_item:{n:'Project — item journal',lf:3,s:[
+   {n:'Released product / item',e:['item'],f:[['item','p']]},
+   {n:'Project',e:['item','project'],f:[['project','l']]},
+   {n:'Item journal line',e:['item','project'],f:[]},
+   {n:'Item + project posting',e:['item','project'],f:[]},
+   {n:'Posted voucher',e:['item','project'],f:[]}]},
+ pj_fee:{n:'Project — fee journal',lf:3,s:[
+   {n:'Project',e:['project'],f:[['project','p']]},
+   {n:'Funding source',e:['project'],f:[]},
+   {n:'Fee journal line',e:['project'],f:[]},
+   {n:'Revenue posting',e:['project'],f:[]},
+   {n:'Posted voucher',e:['project'],f:[]}]},
+ pj_onaccount:{n:'Project — on-account (milestone)',lf:3,s:[
+   {n:'Project contract / funding source',e:['project'],f:[['project','p']]},
+   {n:'On-account (milestone) line',e:['project'],f:[]},
+   {n:'Project invoice (to customer)',e:['customer','project'],f:[['customer','l']]},
+   {n:'Revenue recognition posting',e:['project'],f:[]},
+   {n:'Customer payment',e:['customer','bank'],f:[['customer','p']],nd:1}]},
+ pj_invoice:{n:'Project — invoice proposal',lf:2,s:[
+   {n:'Project transactions (WIP)',e:['project'],f:[['project','p']]},
+   {n:'Invoice proposal',e:['customer','project'],f:[['customer','l']]},
+   {n:'Project invoice posting',e:['customer','project'],f:[]},
+   {n:'Customer payment',e:['customer','bank'],f:[['customer','p']],nd:1}]},
+ pj_revrec:{n:'Project — revenue recognition',lf:2,s:[
+   {n:'Project (estimate)',e:['project'],f:[['project','p']]},
+   {n:'Estimate / cost template',e:['project'],f:[]},
+   {n:'Revenue recognition (WIP accrued)',e:['project'],f:[]},
+   {n:'Posted voucher',e:['project'],f:[]}]},
+/* ---- Acquire to dispose (Fixed assets) ---- */
+ fa_acq_journal:{n:'FA — acquisition (journal)',lf:3,s:[
+   {n:'Fixed asset master',e:['asset'],f:[['asset','p']]},
+   {n:'Asset book',e:['asset'],f:[]},
+   {n:'Acquisition journal line',e:['asset'],f:[]},
+   {n:'Acquisition posting',e:['asset'],f:[]},
+   {n:'Posted voucher',e:['asset'],f:[]}]},
+ fa_acq_po:{n:'FA — acquisition via PO',lf:2,s:[
+   {n:'Vendor master',e:['vendor'],f:[['vendor','p']]},
+   {n:'PO line (fixed asset)',e:['vendor','asset'],f:[['asset','l']]},
+   {n:'Product receipt',e:['vendor','asset'],f:[]},
+   {n:'Vendor invoice (capitalize)',e:['vendor','asset'],f:[]},
+   {n:'FA acquisition posting',e:['asset'],f:[]}]},
+ fa_dep:{n:'FA — depreciation',lf:2,s:[
+   {n:'Fixed asset / book',e:['asset'],f:[['asset','p']]},
+   {n:'Depreciation proposal line',e:['asset'],f:[]},
+   {n:'Depreciation posting',e:['asset'],f:[]},
+   {n:'Posted voucher',e:['asset'],f:[]}]},
+ fa_reval:{n:'FA — revaluation / write-up',lf:2,s:[
+   {n:'Fixed asset / book',e:['asset'],f:[['asset','p']]},
+   {n:'Revaluation journal line',e:['asset'],f:[]},
+   {n:'Write-up / down posting',e:['asset'],f:[]},
+   {n:'Posted voucher',e:['asset'],f:[]}]},
+ fa_disp_sale:{n:'FA — disposal (sale)',lf:2,s:[
+   {n:'Fixed asset / book',e:['asset'],f:[['asset','p']]},
+   {n:'Disposal - sale journal',e:['asset'],f:[]},
+   {n:'Disposal posting (gain / loss)',e:['asset'],f:[]},
+   {n:'Posted voucher',e:['asset'],f:[]}]},
+ fa_disp_scrap:{n:'FA — disposal (scrap)',lf:2,s:[
+   {n:'Fixed asset / book',e:['asset'],f:[['asset','p']]},
+   {n:'Disposal - scrap journal',e:['asset'],f:[]},
+   {n:'Disposal posting (loss)',e:['asset'],f:[]},
+   {n:'Posted voucher',e:['asset'],f:[]}]},
+ fa_transfer:{n:'FA — transfer (book / dimension)',lf:2,s:[
+   {n:'Fixed asset / book',e:['asset'],f:[['asset','p']]},
+   {n:'Transfer (new dimension / book)',e:['asset'],f:[]},
+   {n:'Transfer posting',e:['asset'],f:[]},
+   {n:'Posted voucher',e:['asset'],f:[]}]},
+ fa_reclass:{n:'FA — reclassification',lf:2,s:[
+   {n:'Fixed asset / book',e:['asset'],f:[['asset','p']]},
+   {n:'Reclassification journal',e:['asset'],f:[]},
+   {n:'Reclass posting',e:['asset'],f:[]},
+   {n:'Posted voucher',e:['asset'],f:[]}]},
+/* ---- Inventory to deliver ---- */
+ inv_movement:{n:'Inventory — movement journal',lf:2,s:[
+   {n:'Released product / item',e:['item'],f:[['item','p']]},
+   {n:'Movement line (offset ledger)',e:['item','ledger'],f:[['ledger','l']]},
+   {n:'Inventory posting',e:['item','ledger'],f:[]},
+   {n:'Posted voucher',e:['item','ledger'],f:[]}]},
+ inv_adjustment:{n:'Inventory — adjustment journal',lf:2,s:[
+   {n:'Released product / item',e:['item'],f:[['item','p']]},
+   {n:'Adjustment line',e:['item'],f:[]},
+   {n:'Inventory posting (P&L offset)',e:['item'],f:[]},
+   {n:'Posted voucher',e:['item'],f:[]}]},
+ inv_transfer_j:{n:'Inventory — transfer journal',lf:2,s:[
+   {n:'Released product / item',e:['item'],f:[['item','p']]},
+   {n:'Transfer line (from / to site)',e:['item','site'],f:[['site','l']]},
+   {n:'Inventory posting',e:['item','site'],f:[]},
+   {n:'Posted voucher',e:['item','site'],f:[]}]},
+ transfer_order:{n:'Transfer order (ship / receive)',lf:2,s:[
+   {n:'Released product / item',e:['item'],f:[['item','p']]},
+   {n:'Transfer order line (from / to)',e:['item','site'],f:[['site','l']]},
+   {n:'Ship (in-transit)',e:['item','site'],f:[]},
+   {n:'Receive (destination)',e:['item','site'],f:[]},
+   {n:'Posted vouchers',e:['item','site'],f:[]}]},
+ inv_counting:{n:'Inventory — counting journal',lf:2,s:[
+   {n:'Released product / item',e:['item'],f:[['item','p']]},
+   {n:'Counting line',e:['item','site'],f:[['site','l']]},
+   {n:'Inventory posting (profit / loss)',e:['item','site'],f:[]},
+   {n:'Posted voucher',e:['item','site'],f:[]}]},
+ bom_journal:{n:'Inventory — BOM journal',lf:2,s:[
+   {n:'Finished item + components',e:['item'],f:[['item','p']]},
+   {n:'BOM journal lines',e:['item','site'],f:[['site','l']]},
+   {n:'Consumption + receipt posting',e:['item','site'],f:[]},
+   {n:'Posted voucher',e:['item','site'],f:[]}]},
+ inv_reval:{n:'Inventory — revaluation / cost adj.',lf:2,s:[
+   {n:'Released product / item',e:['item'],f:[['item','p']]},
+   {n:'Revaluation / cost adjustment',e:['item'],f:[]},
+   {n:'Inventory revaluation posting',e:['item'],f:[]},
+   {n:'Posted voucher',e:['item'],f:[]}]},
+ inv_closing:{n:'Inventory — closing / settlement',lf:2,s:[
+   {n:'Item costs (period)',e:['item'],f:[['item','p']]},
+   {n:'Inventory close (settlements)',e:['item'],f:[]},
+   {n:'Adjustment postings',e:['item'],f:[]},
+   {n:'Posted vouchers',e:['item'],f:[]}]},
+/* ---- Plan to produce ---- */
+ prod_start:{n:'Production — start (pick + route)',lf:3,s:[
+   {n:'Released product (finished)',e:['item'],f:[['item','p']]},
+   {n:'Picking list (components + site)',e:['item','site'],f:[['site','l']]},
+   {n:'Route / job card (labor)',e:['item','site'],f:[]},
+   {n:'WIP posting',e:['item','site'],f:[]}]},
+ prod_raf:{n:'Production — report as finished',lf:2,s:[
+   {n:'Production order (finished item)',e:['item'],f:[['item','p']]},
+   {n:'Report as finished',e:['item','site'],f:[['site','l']]},
+   {n:'Finished goods posting (estimated)',e:['item','site'],f:[]},
+   {n:'Posted voucher',e:['item','site'],f:[]}]},
+ prod_end:{n:'Production — end (costing)',lf:2,s:[
+   {n:'Production order',e:['item'],f:[['item','p']]},
+   {n:'End (cost calculation)',e:['item'],f:[]},
+   {n:'WIP → finished (actual cost)',e:['item'],f:[]},
+   {n:'Posted vouchers',e:['item'],f:[]}]},
+ batch_order:{n:'Production — batch (co / by-products)',lf:2,s:[
+   {n:'Batch order (formula item)',e:['item'],f:[['item','p']]},
+   {n:'Co-products / by-products',e:['item','site'],f:[['site','l']]},
+   {n:'Batch posting',e:['item','site'],f:[]},
+   {n:'Posted vouchers',e:['item','site'],f:[]}]},
+ subcontract:{n:'Production — subcontracting',lf:2,s:[
+   {n:'Service PO (subcontract)',e:['vendor'],f:[['vendor','p']]},
+   {n:'Subcontract line (item / service)',e:['vendor','item'],f:[['item','l']]},
+   {n:'Receipt to WIP',e:['vendor','item'],f:[]},
+   {n:'Vendor invoice',e:['vendor','item'],f:[]}]},
+/* ---- Expense & cash ---- */
+ expense_report:{n:'Expense report (Expense mgmt)',lf:3,s:[
+   {n:'Worker',e:['worker'],f:[['worker','p']]},
+   {n:'Expense report header',e:['worker'],f:[]},
+   {n:'Expense line (category / ledger)',e:['worker','ledger'],f:[['ledger','l']]},
+   {n:'Expense posting',e:['worker','ledger'],f:[]},
+   {n:'Reimbursement payment',e:['worker','bank'],f:[['worker','p']],nd:1}]},
+ cash_advance:{n:'Cash advance',lf:2,s:[
+   {n:'Worker',e:['worker'],f:[['worker','p']]},
+   {n:'Cash advance request',e:['worker'],f:[]},
+   {n:'Advance payment',e:['worker','bank'],f:[]},
+   {n:'Settlement to expense',e:['worker'],f:[]}]},
+ bank_deposit:{n:'Bank — deposit',lf:2,s:[
+   {n:'Bank account',e:['bank'],f:[['bank','p']]},
+   {n:'Deposit slip line',e:['bank','ledger'],f:[['ledger','l']]},
+   {n:'Deposit posting',e:['bank','ledger'],f:[]},
+   {n:'Posted voucher',e:['bank','ledger'],f:[]}]},
+ bank_fee:{n:'Bank — fee / adjustment',lf:2,s:[
+   {n:'Bank account',e:['bank'],f:[['bank','p']]},
+   {n:'Bank fee journal',e:['bank','ledger'],f:[['ledger','l']]},
+   {n:'Fee posting',e:['bank','ledger'],f:[]},
+   {n:'Posted voucher',e:['bank','ledger'],f:[]}]},
+ bank_transfer:{n:'Bank — bank-to-bank transfer',lf:2,s:[
+   {n:'Source bank account',e:['bank'],f:[['bank','p']]},
+   {n:'Bank transfer (bridging)',e:['bank'],f:[]},
+   {n:'Transfer posting',e:['bank'],f:[]},
+   {n:'Posted vouchers',e:['bank'],f:[]}]},
+/* ---- Tax ---- */
+ tax_settle:{n:'Sales tax settlement',lf:2,s:[
+   {n:'Tax transactions (period)',e:['ledger'],f:[['ledger','p']]},
+   {n:'Settle and post sales tax',e:['ledger'],f:[]},
+   {n:'Tax settlement posting',e:['ledger'],f:[]},
+   {n:'Posted voucher',e:['ledger'],f:[]}]},
+ wht:{n:'Withholding tax',lf:2,s:[
+   {n:'Vendor master (WHT group)',e:['vendor'],f:[['vendor','p']]},
+   {n:'Invoice with withholding',e:['vendor','ledger'],f:[['ledger','l']]},
+   {n:'WHT posting',e:['vendor','ledger'],f:[]},
+   {n:'Payment (net of WHT)',e:['vendor','bank'],f:[['vendor','p']],nd:1}]}
+};
+
+const AREAS=[
+ {n:'Order to cash',ps:['so_stock','so_direct','fti','sales_agr','so_return','cust_pay','cust_prepay','bad_debt','interest']},
+ {n:'Procure to pay',ps:['po_stock','po_service','po_return','vend_inv_po','vend_inv_nonpo','purch_agr','vend_pay','vend_prepay']},
+ {n:'Record to report',ps:['gl_journal','allocation','accrual','fx_reval','ledger_settle','intercompany','consolidation']},
+ {n:'Project to profit',ps:['pj_hour','pj_expense','pj_item','pj_fee','pj_onaccount','pj_invoice','pj_revrec']},
+ {n:'Acquire to dispose',ps:['fa_acq_journal','fa_acq_po','fa_dep','fa_reval','fa_disp_sale','fa_disp_scrap','fa_transfer','fa_reclass']},
+ {n:'Inventory to deliver',ps:['inv_movement','inv_adjustment','inv_transfer_j','transfer_order','inv_counting','bom_journal','inv_reval','inv_closing']},
+ {n:'Plan to produce',ps:['prod_start','prod_raf','prod_end','batch_order','subcontract']},
+ {n:'Expense & cash',ps:['expense_report','cash_advance','bank_deposit','bank_fee','bank_transfer']},
+ {n:'Tax',ps:['tax_settle','wht']}
+];
+
+/* ledger posting templates: [side, account]  side 'd'=debit 'c'=credit */
+const POSTINGS={
+ so_packing:[['d','Cost of goods sold — delivered'],['c','Inventory — issued (clearing)']],
+ so_invoice:[['d','Accounts receivable — customer balance'],['c','Sales revenue'],['d','Cost of goods sold — invoiced'],['c','Inventory — issued']],
+ so_credit:[['d','Sales revenue — reversal'],['c','Accounts receivable'],['d','Inventory — returned'],['c','Cost of goods sold — reversal']],
+ so_return_receipt:[['d','Inventory — returned (clearing)'],['c','Cost of goods sold — delivered (reversal)']],
+ fti_invoice:[['d','Accounts receivable — customer balance'],['c','Ledger offset (revenue / other)']],
+ cust_payment:[['d','Bank / cash'],['c','Accounts receivable — customer balance']],
+ cust_prepay:[['d','Bank / cash'],['c','Customer prepayment — liability']],
+ bad_debt:[['d','Bad debt expense'],['c','Accounts receivable']],
+ interest_post:[['d','Accounts receivable'],['c','Interest income']],
+ po_receipt:[['d','Inventory / receipt — accrued'],['c','Purchase accrual — un-invoiced']],
+ po_service_receipt:[['d','Expense — accrued'],['c','Purchase accrual — un-invoiced']],
+ vend_invoice_stock:[['d','Purchase accrual — reversed'],['c','Accounts payable — vendor balance']],
+ vend_invoice_service:[['d','Expense'],['c','Accounts payable — vendor balance']],
+ vend_invoice_nonpo:[['d','Expense / ledger account'],['c','Accounts payable — vendor balance']],
+ po_receipt_rev:[['d','Purchase accrual — reversed'],['c','Inventory — returned']],
+ vend_credit:[['d','Accounts payable'],['c','Inventory / expense']],
+ vend_payment:[['d','Accounts payable — vendor balance'],['c','Bank / cash']],
+ vend_prepay:[['d','Vendor prepayment — asset'],['c','Bank / cash']],
+ gl_post:[['d','Ledger account — debit'],['c','Ledger account — credit']],
+ allocation_post:[['c','Source account — allocated out'],['d','Destination accounts — allocated in']],
+ accrual_post:[['d','Expense — recognized'],['c','Deferred / accrued account']],
+ fx_post:[['d','Unrealized FX loss'],['c','Currency revaluation — balance account']],
+ ic_post:[['d','Due from affiliate'],['c','Due to affiliate / bank']],
+ elim_post:[['d','Elimination — intercompany revenue'],['c','Elimination — intercompany cost']],
+ pj_hour_post:[['d','Project WIP / cost — hour'],['c','Payroll allocation']],
+ pj_expense_post:[['d','Project WIP / cost — expense'],['c','Ledger / AP offset']],
+ pj_item_post:[['d','Project WIP / cost — item'],['c','Inventory — issued']],
+ pj_fee_post:[['d','Accrued revenue / WIP'],['c','Project fee revenue']],
+ pj_invoice_post:[['d','Accounts receivable — customer balance'],['c','Invoiced revenue / WIP']],
+ pj_revrec_post:[['d','WIP — accrued revenue'],['c','Project revenue — recognized']],
+ fa_acq_post:[['d','Fixed asset — acquisition cost'],['c','Acquisition offset / clearing']],
+ fa_po_invoice:[['d','Fixed asset — acquisition cost'],['c','Accounts payable — vendor balance']],
+ fa_dep_post:[['d','Depreciation expense'],['c','Accumulated depreciation']],
+ fa_reval_post:[['d','Fixed asset — write-up'],['c','Revaluation reserve / income']],
+ fa_disp_sale_post:[['d','Bank / receivable'],['d','Accumulated depreciation'],['c','Fixed asset — cost'],['c','Gain on disposal']],
+ fa_disp_scrap_post:[['d','Accumulated depreciation'],['d','Loss on disposal'],['c','Fixed asset — cost']],
+ fa_transfer_post:[['d','Fixed asset — new dimension / book'],['c','Fixed asset — prior dimension / book']],
+ fa_reclass_post:[['d','Fixed asset — target group'],['c','Fixed asset — source group']],
+ inv_move:[['d','Inventory'],['c','Offset — ledger account']],
+ inv_adj_in:[['d','Inventory'],['c','Inventory profit — P&L']],
+ inv_transfer:[['d','Inventory — to warehouse'],['c','Inventory — from warehouse']],
+ to_ship:[['d','In-transit inventory'],['c','Inventory — source warehouse']],
+ to_receive:[['d','Inventory — destination warehouse'],['c','In-transit inventory']],
+ inv_count_surplus:[['d','Inventory'],['c','Counting profit — P&L']],
+ bom_post:[['d','BOM consumption / WIP'],['c','Inventory — components'],['d','Inventory — finished item'],['c','BOM production offset']],
+ inv_reval_post:[['d','Inventory'],['c','Inventory revaluation — P&L']],
+ inv_close_post:[['d','Inventory — cost adjustment'],['c','COGS / inventory adjustment']],
+ prod_pick_post:[['d','WIP — materials'],['c','Inventory — raw materials']],
+ prod_route_post:[['d','WIP — labor / overhead'],['c','Resource absorbed']],
+ prod_raf_post:[['d','Finished goods — estimated cost'],['c','WIP — manufactured']],
+ prod_end_post:[['d','WIP → finished — actual cost'],['c','WIP / production variance']],
+ batch_post:[['d','Finished + co / by-products'],['c','WIP — batch']],
+ subcontract_receipt:[['d','WIP — subcontract service'],['c','Purchase accrual']],
+ expense_post:[['d','Expense — category'],['c','Worker payable / ledger']],
+ reimburse_post:[['d','Worker payable'],['c','Bank / cash']],
+ advance_post:[['d','Employee advance — asset'],['c','Bank / cash']],
+ deposit_post:[['d','Bank / cash'],['c','Ledger offset']],
+ bank_fee_post:[['d','Bank charges — expense'],['c','Bank / cash']],
+ bank_transfer_post:[['d','Bank — destination / bridging'],['c','Bank — source']],
+ tax_settle_post:[['d','Sales tax payable — collected'],['c','Sales tax settlement account']],
+ wht_post:[['d','Expense / accounts payable'],['c','Withholding tax payable']]
+};
+/* which stage index of each process posts, and with which template */
+const POST_BY_PROC={
+ so_stock:{4:'so_packing',5:'so_invoice',6:'cust_payment'},
+ so_direct:{3:'so_packing',4:'so_invoice',5:'cust_payment'},
+ fti:{3:'fti_invoice',4:'cust_payment'},
+ sales_agr:{3:'so_packing',4:'so_invoice'},
+ so_return:{3:'so_return_receipt',4:'so_credit'},
+ cust_pay:{3:'cust_payment'},
+ cust_prepay:{2:'cust_prepay'},
+ bad_debt:{2:'bad_debt'},
+ interest:{3:'interest_post'},
+ po_stock:{4:'po_receipt',5:'vend_invoice_stock',6:'vend_payment'},
+ po_service:{3:'po_service_receipt',4:'vend_invoice_service',5:'vend_payment'},
+ po_return:{3:'po_receipt_rev',4:'vend_credit'},
+ vend_inv_po:{4:'vend_invoice_stock',5:'vend_payment'},
+ vend_inv_nonpo:{3:'vend_invoice_nonpo',4:'vend_payment'},
+ purch_agr:{3:'po_receipt',4:'vend_invoice_stock'},
+ vend_pay:{3:'vend_payment'},
+ vend_prepay:{2:'vend_prepay'},
+ gl_journal:{4:'gl_post'},
+ allocation:{3:'allocation_post'},
+ accrual:{3:'accrual_post'},
+ fx_reval:{3:'fx_post'},
+ ledger_settle:{},
+ intercompany:{3:'ic_post'},
+ consolidation:{2:'elim_post'},
+ pj_hour:{4:'pj_hour_post'},
+ pj_expense:{4:'pj_expense_post'},
+ pj_item:{4:'pj_item_post'},
+ pj_fee:{4:'pj_fee_post'},
+ pj_onaccount:{2:'pj_invoice_post',3:'pj_revrec_post',4:'cust_payment'},
+ pj_invoice:{2:'pj_invoice_post',3:'cust_payment'},
+ pj_revrec:{3:'pj_revrec_post'},
+ fa_acq_journal:{4:'fa_acq_post'},
+ fa_acq_po:{2:'po_receipt',3:'fa_po_invoice'},
+ fa_dep:{3:'fa_dep_post'},
+ fa_reval:{3:'fa_reval_post'},
+ fa_disp_sale:{3:'fa_disp_sale_post'},
+ fa_disp_scrap:{3:'fa_disp_scrap_post'},
+ fa_transfer:{3:'fa_transfer_post'},
+ fa_reclass:{3:'fa_reclass_post'},
+ inv_movement:{3:'inv_move'},
+ inv_adjustment:{3:'inv_adj_in'},
+ inv_transfer_j:{3:'inv_transfer'},
+ transfer_order:{2:'to_ship',3:'to_receive'},
+ inv_counting:{3:'inv_count_surplus'},
+ bom_journal:{3:'bom_post'},
+ inv_reval:{3:'inv_reval_post'},
+ inv_closing:{3:'inv_close_post'},
+ prod_start:{1:'prod_pick_post',2:'prod_route_post'},
+ prod_raf:{2:'prod_raf_post'},
+ prod_end:{2:'prod_end_post'},
+ batch_order:{2:'batch_post'},
+ subcontract:{2:'subcontract_receipt',3:'vend_invoice_service'},
+ expense_report:{3:'expense_post',4:'reimburse_post'},
+ cash_advance:{2:'advance_post'},
+ bank_deposit:{2:'deposit_post'},
+ bank_fee:{2:'bank_fee_post'},
+ bank_transfer:{2:'bank_transfer_post'},
+ tax_settle:{2:'tax_settle_post'},
+ wht:{2:'wht_post',3:'vend_payment'}
+};
+
+const PRESET=[
+ {name:'BusinessUnit',backing:'Business unit',values:['010','020','030'],defaults:{customer:'010',vendor:'010',worker:'010',project:'010',asset:'010',bank:'010',ledger:'010'},struct:{asset:'opt',liability:'opt',revenue:'opt',expense:'opt'}},
+ {name:'Customer',backing:'Customer',values:['C-1010','C-1020'],defaults:{},struct:{asset:'opt',liability:'no',revenue:'opt',expense:'no'}},
+ {name:'CostCenter',backing:'Cost center',values:['100','200','500'],defaults:{item:'500',worker:'200'},struct:{asset:'no',liability:'no',revenue:'req',expense:'req'}},
+ {name:'Region',backing:'Custom list',values:['North','South','West'],defaults:{item:'West'},struct:{asset:'no',liability:'no',revenue:'opt',expense:'opt'}}
+];
+
+let dims=[], curArea=0, curProc=AREAS[0].ps[0];
+
+/* ================= helpers ================= */
+const $=id=>document.getElementById(id);
+const optHtml=(vals,cur)=>['(blank)'].concat(vals).map(v=>`<option${v===cur?' selected':''}>${v}</option>`).join('');
+const backHtml=cur=>BACKGROUPS.map(g=>`<optgroup label="${g.g}">${g.items.map(b=>`<option${b===cur?' selected':''}>${b}</option>`).join('')}</optgroup>`).join('');
+const isCustomLike=b=>EK[b]===null;
+
+/* ================= section 1: dimensions ================= */
+function rowHtml(d,i){
+ const chips=d.values.map(v=>`<span class="vchip">${v}<button data-act="rmval" data-idx="${i}" data-val="${v}" title="Remove value">&times;</button></span>`).join('');
+ const ek=EK[d.backing];
+ let tag='';
+ if(OU.indexOf(d.backing)!==-1) tag=`<span class="ou-tag" style="margin-left:8px">operating unit &middot; values from Org admin</span>`;
+ else if(ek) tag=`<span class="ou-tag" style="margin-left:8px;color:var(--accent);background:var(--accent2)">entity-backed &middot; values are ${ELAB[ek]} accounts</span>`;
+ const note = ek?`<div class="subnote" style="margin-top:7px">Also auto-populates as the ${ELAB[ek]} account wherever a ${ELAB[ek]} is on the transaction — <em>and</em> can default from any master in the matrix below (e.g. a customer dimension carried on a vendor or item).</div>`:'';
+ const body=`<div class="vals"><label class="fd-lab" style="margin-bottom:6px;display:block">Values ${tag}</label>
+   <div class="chips">${chips}<input class="vadd" data-idx="${i}" placeholder="type value + Enter"><button class="vaddbtn" data-act="addval" data-idx="${i}" title="Add value">+</button></div>${note}</div>`;
+ const struct='';
+ return `<div class="dcard" data-idx="${i}">
+  <div class="drow">
+   <div class="dcol"><label class="fd-lab">Dimension name</label><input class="fd-in" data-f="name" data-idx="${i}" value="${d.name}"></div>
+   <div class="dcol"><label class="fd-lab">Backing type</label><select class="fd-sel" data-f="backing" data-idx="${i}">${backHtml(d.backing)}</select></div>
+   <button class="drm" data-act="rmdim" data-idx="${i}" title="Remove dimension">&times;</button>
+  </div>
+  ${body}${struct}
+ </div>`;
+}
+let pendingFocus=null;
+function addVal(i){
+ const inp=$('dimList').querySelector(`.vadd[data-idx="${i}"]`);
+ if(!inp)return;const v=inp.value.trim();
+ if(v && !dims[i].values.includes(v)){dims[i].values.push(v);pendingFocus=i;renderDims();renderMatrix();renderFlow();}
+ else inp.value='';
+}
+function rmVal(i,v){
+ dims[i].values=dims[i].values.filter(x=>x!==v);
+ Object.keys(dims[i].defaults).forEach(k=>{if(dims[i].defaults[k]===v)delete dims[i].defaults[k];});
+ renderDims();renderMatrix();renderFlow();
+}
+function renderDims(){
+ $('dimList').innerHTML = dims.length ? dims.map(rowHtml).join('') : '<div class="empty">No dimensions. Add one, or reset to the example.</div>';
+ $('dimList').querySelectorAll('[data-f=name]').forEach(el=>el.addEventListener('input',e=>{const i=+e.target.dataset.idx;dims[i].name=e.target.value;const th=$('matrixWrap').querySelector(`th[data-idx="${i}"]`);if(th)th.textContent=e.target.value;const th2=$('structWrap').querySelector(`th[data-sidx="${i}"]`);if(th2)th2.textContent=e.target.value;renderFlow();}));
+ $('dimList').querySelectorAll('[data-f=backing]').forEach(el=>el.addEventListener('change',e=>{const i=+e.target.dataset.idx;dims[i].backing=e.target.value;renderDims();renderMatrix();renderFlow();}));
+ $('dimList').querySelectorAll('[data-act=rmdim]').forEach(el=>el.addEventListener('click',e=>{dims.splice(+e.currentTarget.dataset.idx,1);renderDims();renderMatrix();renderFlow();}));
+ $('dimList').querySelectorAll('[data-act=addval]').forEach(el=>el.addEventListener('click',e=>addVal(+e.currentTarget.dataset.idx)));
+ $('dimList').querySelectorAll('[data-act=rmval]').forEach(el=>el.addEventListener('click',e=>rmVal(+e.currentTarget.dataset.idx,e.currentTarget.dataset.val)));
+ $('dimList').querySelectorAll('.vadd').forEach(el=>el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addVal(+e.currentTarget.dataset.idx);}}));
+ if(pendingFocus!==null){const inp=$('dimList').querySelector(`.vadd[data-idx="${pendingFocus}"]`);if(inp)inp.focus();pendingFocus=null;}
+}
+
+/* ================= section 2: default-dimension matrix ================= */
+function renderMatrix(){
+ const cols=dims.map((d,i)=>({d,i}));
+ if(!cols.length){$('matrixWrap').innerHTML='<div class="empty">Add a dimension above to set its default financial dimensions on masters.</div>';return;}
+ const grp=(label,rows)=>`<tr class="grp"><td colspan="${cols.length+1}">${label}</td></tr>`+rows.map(([sk,slab])=>`<tr><td>${slab}</td>`+cols.map(o=>`<td><select data-src="${sk}" data-idx="${o.i}">${optHtml(o.d.values,o.d.defaults[sk]||'(blank)')}</select></td>`).join('')+'</tr>').join('');
+ let h='<table class="mtx"><thead><tr><th>Master / source</th>'+cols.map(o=>`<th data-idx="${o.i}">${o.d.name}</th>`).join('')+'</tr></thead><tbody>';
+ h+=grp('Master-level (header) sources — applied first, at the document header',SRC_MASTER);
+ h+=grp('Line-level sources — applied at the line, fill blanks only',SRC_LINE);
+ h+='</tbody></table>';
+ $('matrixWrap').innerHTML=h;
+ $('matrixWrap').querySelectorAll('select').forEach(el=>el.addEventListener('change',e=>{const i=+e.target.dataset.idx,sk=e.target.dataset.src,v=e.target.value;if(v==='(blank)')delete dims[i].defaults[sk];else dims[i].defaults[sk]=v;renderFlow();}));
+ renderStructure();
+}
+function renderStructure(){
+ const cols=dims.map((d,i)=>({d,i}));
+ if(!cols.length){$('structWrap').innerHTML='<div class="empty">Add a dimension to configure the account structure.</div>';return;}
+ let h='<table class="mtx"><thead><tr><th>Main-account range</th>'+cols.map(o=>`<th data-sidx="${o.i}">${o.d.name}</th>`).join('')+'</tr></thead><tbody>';
+ CATS.forEach(([ck,cl])=>{
+  h+=`<tr><td>${cl}</td>`+cols.map(o=>{
+    const cur=(o.d.struct&&o.d.struct[ck])||'opt';
+    return `<td><select data-cat="${ck}" data-idx="${o.i}">${RULES.map(([rv,rl])=>`<option value="${rv}"${rv===cur?' selected':''}>${rl}</option>`).join('')}</select></td>`;
+  }).join('')+'</tr>';
+ });
+ h+='</tbody></table>';
+ $('structWrap').innerHTML=h;
+ $('structWrap').querySelectorAll('select').forEach(el=>el.addEventListener('change',e=>{const i=+e.target.dataset.idx,ck=e.target.dataset.cat;if(!dims[i].struct)dims[i].struct={};dims[i].struct[ck]=e.target.value;renderFlow();}));
+}
+
+/* ================= flow engine ================= */
+function trace(proc){
+ const P=PROCS[proc];
+ const st=dims.map(()=>({v:'(blank)',o:null,src:null}));
+ const rows=[];
+ P.s.forEach(stage=>{
+  const cells=dims.map((d,di)=>{
+   const s=st[di];const bv=s.v;
+   if(stage.nd){ s.v='(blank)'; s.o=null; s.src=null; }   // new document: re-derive from this document's masters
+   const ek=EK[d.backing];
+   // entity-backed: auto-populates as its own party account wherever that party is present (fills a blank)
+   if(ek && stage.e.includes(ek) && s.v==='(blank)'){ s.v=ENT[ek]; s.o='entity'; s.src=ek; }
+   // default financial dimensions on this stage's masters (any dimension), fill blanks only
+   stage.f.forEach(([sk,role])=>{
+     if(s.v==='(blank)' && d.defaults[sk] && d.defaults[sk]!=='(blank)'){ s.v=d.defaults[sk]; s.o=(role==='p'?'master':'line'); s.src=sk; }
+   });
+   return {v:s.v,o:s.o,src:s.src,changed:(s.v!==bv),cleared:(s.v!==bv && s.v==='(blank)')};
+  });
+  rows.push({stage,cells});
+ });
+ return rows;
+}
+function pill(v,o){
+ let stl;
+ if(o==='entity') stl='background:var(--accent2);color:var(--accent);';
+ else if(o==='master') stl='background:var(--dr2);color:var(--dr);';
+ else if(o==='line') stl='background:var(--ov2);color:var(--ov);';
+ else stl='background:transparent;color:var(--text3);border:.5px solid var(--border);';
+ return `<span class="pill" style="${stl}">${v==='(blank)'?'&mdash;':v}</span>`;
+}
+/* classify a ledger account: which master its dimensions come from, and its type (bs / pnl) */
+function acctMeta(acc){
+ const a=acc.toLowerCase();
+ let src='line';
+ if(/accounts receivable|customer prepayment/.test(a)) src='customer';
+ else if(/accounts payable|vendor prepayment/.test(a)) src='vendor';
+ else if(/bank \/ cash|bank — (source|destination)|bank \/ receivable/.test(a)) src='bank';
+ else if(/worker payable|employee advance/.test(a)) src='worker';
+ else if(/fixed asset|accumulated depreciation/.test(a)) src='asset';
+ else if(/due (from|to)|sales tax|withholding tax|currency revaluation|ledger account —|deferred|elimination|allocated (in|out)|ledger \/ ap offset/.test(a)) src='ledger';
+ const pnl=/(revenue|cost of goods|\bcogs\b|expense|\bprofit\b|\bloss\b|\bgain\b|absorbed|variance|charges|interest income|bad debt|allocated (in|out)|recognized|elimination|deferred|unrealized fx|production offset|payroll allocation|wip \/ cost|offset — ledger|ledger offset|fee revenue|ledger account —)/.test(a);
+ return {src, t:pnl?'pnl':'bs'};
+}
+/* dimensions a specific master contributes: its own entity value + its default financial dimensions */
+function masterProfile(srcKey){
+ return dims.map(d=>{
+   const ek=EK[d.backing];
+   if(ek && ek===srcKey) return {v:ENT[srcKey], o:'entity'};
+   if(d.defaults[srcKey] && d.defaults[srcKey]!=='(blank)') return {v:d.defaults[srcKey], o:'master'};
+   return {v:'(blank)', o:null};
+ });
+}
+
+/* ================= render flow ================= */
+function renderFlow(){
+ const P=PROCS[curProc];
+ $('flowTitle').textContent='Dimension flow — '+P.n;
+ $('hint').innerHTML=`<strong>${P.n}</strong> &nbsp;·&nbsp; The pills show the running dimensions carried on the document. At a <strong>posting</strong> stage each ledger line derives from its <em>own</em> master — AR from the customer, AP from the vendor, bank from the bank account, revenue / COGS / inventory from the transaction line — then the <strong>account structure</strong> (section 3) applies: any dimension not allowed on that account's main-account range is stripped, and a required one that arrived blank is flagged. Payments and settlements are separate documents, so their dimensions re-derive rather than carrying from the invoice.`;
+ const el=$('flow');
+ if(!dims.length){el.innerHTML='<div class="empty">Configure at least one dimension to see it flow.</div>';return;}
+ const rows=trace(curProc);
+ let html='';
+ rows.forEach((r,i)=>{
+  if(i===P.lf) html+='<div class="divr"><span class="ln"></span>Ledger posting<span class="ln"></span></div>';
+  const caps=[];
+  r.cells.forEach((c,ci)=>{
+   if(!c.changed)return;
+   const d=dims[ci];const ek=EK[d.backing];
+   if(c.cleared) caps.push(`${d.name} cleared`);
+   else if(c.o==='entity') caps.push(`${d.name} = ${ELAB[ek]} account`);
+   else caps.push(`${d.name} from ${SRCSHORT[c.src]}`);
+  });
+  const cap=caps.join(' · ');
+  const cells=r.cells.map((c,ci)=>`<div class="cell"><div class="cap" title="${dims[ci].name}">${dims[ci].name}</div>${pill(c.v,c.o)}</div>`).join('');
+  const pk=POST_BY_PROC[curProc] && POST_BY_PROC[curProc][i];
+  let postHtml='';
+  if(pk&&POSTINGS[pk]){
+   const LP=rows[i].cells;
+   const lines=POSTINGS[pk].map(([sd,ac])=>{
+    const m=acctMeta(ac);
+    const prof = m.src==='line' ? LP : masterProfile(m.src);
+    const cat=acctCategory(ac);
+    const dh=dims.map((d,di)=>{
+      const rule=(d.struct&&d.struct[cat])||'opt';
+      if(rule==='no') return '';
+      const v=prof[di].v;
+      if(v!=='(blank)') return `<span class="pdim">${d.name}: ${v}</span>`;
+      if(rule==='req') return `<span class="pdim preq">${d.name}: required</span>`;
+      return '';
+    }).filter(Boolean).join('');
+    return `<div class="pline"><span class="acc acc-${sd}">${sd==='d'?'Dr':'Cr'} ${ac}</span><span class="pdims">${dh||'<span class="pnone">no dimensions on this account</span>'}</span></div>`;
+   }).join('');
+   postHtml=`<div class="post-block"><div class="lbl">Posts to ledger — each line takes its own dimensions</div>${lines}</div>`;
+  }
+  html+=`<div class="stage"><div class="stage-row"><div class="stage-nm">${r.stage.n}${cap?`<div class="stage-cap">${cap}</div>`:''}</div><div class="cells">${cells}</div></div>${postHtml}</div>`;
+  if(i<rows.length-1) html+='<div class="arrow">&#8595;</div>';
+ });
+ el.innerHTML=html;
+}
+
+/* ================= navigation ================= */
+function renderAreas(){
+ $('areaTabs').innerHTML=AREAS.map((a,i)=>`<button class="tab${i===curArea?' on':''}" data-a="${i}">${a.n}</button>`).join('');
+ $('areaTabs').querySelectorAll('.tab').forEach(el=>el.addEventListener('click',e=>{curArea=+e.target.dataset.a;curProc=AREAS[curArea].ps[0];renderAreas();renderProcSel();renderFlow();}));
+}
+function renderProcSel(){
+ $('procSel').innerHTML=AREAS[curArea].ps.map(pid=>`<option value="${pid}"${pid===curProc?' selected':''}>${PROCS[pid].n}</option>`).join('');
+}
+$('procSel').addEventListener('change',e=>{curProc=e.target.value;renderFlow();});
+
+/* ================= controls ================= */
+$('resetBtn').addEventListener('click',()=>{dims=JSON.parse(JSON.stringify(PRESET));renderDims();renderMatrix();renderFlow();});
+$('clearBtn').addEventListener('click',()=>{dims=[];renderDims();renderMatrix();renderFlow();});
+$('addBtn').addEventListener('click',()=>{if(dims.length>=5)return;dims.push({name:'Dimension'+(dims.length+1),backing:'Custom list',values:['010','020','030'],defaults:{},struct:{asset:'opt',liability:'opt',revenue:'opt',expense:'opt'}});renderDims();renderMatrix();renderFlow();});
+
+/* ================= init ================= */
+dims=JSON.parse(JSON.stringify(PRESET));
+renderAreas();renderProcSel();renderDims();renderMatrix();renderFlow();
+</script>
+</body>
+</html>
